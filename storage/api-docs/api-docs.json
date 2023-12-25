@@ -459,9 +459,9 @@
                         "type": "integer",
                         "example": "7"
                     },
-                    "nome": {
+                    "descricao": {
                         "type": "string",
-                        "example": "Assunto de teste"
+                        "example": "Descrição do assunto"
                     }
                 },
                 "type": "object"
@@ -502,6 +502,22 @@
                     "anopublicacao": {
                         "type": "integer",
                         "example": "2023"
+                    },
+                    "valor": {
+                        "type": "number",
+                        "example": "20.00"
+                    },
+                    "autores": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Autor"
+                        }
+                    },
+                    "assuntos": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Assunto"
+                        }
                     }
                 },
                 "type": "object"
