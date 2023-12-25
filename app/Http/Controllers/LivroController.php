@@ -142,31 +142,30 @@ class LivroController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // try {
-        $livroValidator = new LivroValidator(array_merge($request->all(), ['id' => $id]));
+        try {
+            $livroValidator = new LivroValidator(array_merge($request->all(), ['id' => $id]));
 
-        if (!$livroValidator->validate()) {
-            return $this->alert($livroValidator->errors(), RESPONSE_NOT_ACCEPTABLE);
+            if (!$livroValidator->validate()) {
+                return $this->alert($livroValidator->errors(), RESPONSE_NOT_ACCEPTABLE);
+            }
+
+            $valid_data = $livroValidator->validated();
+
+            $livro = Livro::findOrFail($id);
+            $livro->update($valid_data);
+
+            if (Arr::has($valid_data, 'autores')) {
+                $livro->autores()->sync($valid_data['autores']);
+            }
+
+            if (Arr::has($valid_data, 'assuntos')) {
+                $livro->assuntos()->sync($valid_data['assuntos']);
+            }
+
+            return $this->success($livro, __('livro.update'));
+        } catch (\Throwable $err) {
+            return $this->error($err->getMessage(), RESPONSE_BAD_REQUEST);
         }
-
-        $valid_data = $livroValidator->validated();
-        dd($valid_data);
-
-        $livro = Livro::findOrFail($id);
-        $livro->update($valid_data);
-
-        if (Arr::has($valid_data, 'autores')) {
-            $livro->autores()->sync($valid_data['autores']);
-        }
-
-        if (Arr::has($valid_data, 'assuntos')) {
-            $livro->assuntos()->sync($valid_data['assuntos']);
-        }
-
-        return $this->success($livro, __('livro.update'));
-        // } catch (\Throwable $err) {
-        //     return $this->error($err->getMessage(), RESPONSE_BAD_REQUEST);
-        // }
     }
 
     /**
