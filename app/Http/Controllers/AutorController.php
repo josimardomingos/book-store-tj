@@ -3,7 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Autor;
+use App\Validators\AutorValidator;
 use Illuminate\Http\Request;
+
+use const App\Traits\RESPONSE_BAD_REQUEST;
+use const App\Traits\RESPONSE_CREATED;
+use const App\Traits\RESPONSE_NOT_ACCEPTABLE;
 
 class AutorController extends Controller
 {
@@ -29,7 +34,7 @@ class AutorController extends Controller
     public function index()
     {
         $autores = Autor::all();
-        return response()->json($autores);
+        return $this->success($autores);
     }
 
     /**
@@ -58,7 +63,7 @@ class AutorController extends Controller
     public function show($id)
     {
         $autor = Autor::findOrFail($id);
-        return response()->json($autor);
+        return $this->success($autor);
     }
 
     /**
@@ -82,8 +87,20 @@ class AutorController extends Controller
      */
     public function store(Request $request)
     {
-        $autor = Autor::create($request->all());
-        return response()->json($autor, 201);
+        try {
+            $autorValidator = new AutorValidator($request->all());
+
+            if (!$autorValidator->validate()) {
+                return $this->alert($autorValidator->errors());
+            }
+
+            $valid_data = $autorValidator->validated();
+
+            $autor = Autor::create($valid_data);
+            return $this->success($autor, __('autor.create'), RESPONSE_CREATED);
+        } catch (\Throwable $err) {
+            return $this->error($err->getMessage(), RESPONSE_BAD_REQUEST);
+        }
     }
 
     /**
@@ -116,9 +133,21 @@ class AutorController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $autor = Autor::findOrFail($id);
-        $autor->update($request->all());
-        return response()->json($autor, 200);
+        try {
+            $autorValidator = new AutorValidator($request->all());
+
+            if (!$autorValidator->validate()) {
+                return $this->alert($autorValidator->errors());
+            }
+
+            $valid_data = $autorValidator->validated();
+
+            $autor = Autor::findOrFail($id);
+            $autor->update($valid_data);
+            return $this->success($autor, __('autor.update'));
+        } catch (\Throwable $err) {
+            return $this->error($err->getMessage(), RESPONSE_BAD_REQUEST);
+        }
     }
 
     /**
@@ -145,8 +174,12 @@ class AutorController extends Controller
      */
     public function destroy($id)
     {
-        $autor = Autor::findOrFail($id);
-        $autor->delete();
-        return response()->json(null, 204);
+        try {
+            $autor = Autor::findOrFail($id);
+            $autor->delete();
+            return $this->no_content();
+        } catch (\Throwable $err) {
+            return $this->error($err->getMessage(), RESPONSE_BAD_REQUEST);
+        }
     }
 }

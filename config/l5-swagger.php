@@ -5,7 +5,7 @@ return [
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'Book-Store API',
+                'title' => config('app.name') . ' API',
             ],
 
             'routes' => [

@@ -79,4 +79,18 @@ trait ApiResponser
             'data' => $data,
         ], $code);
     }
+
+
+    /**
+     * Return a no content JSON response.
+     *
+     * @param  string  $message
+     * @param  int  $code
+     * @param  array|string|null  $data
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function no_content()
+    {
+        return response()->json(null, RESPONSE_NO_CONTENT);
+    }
 }

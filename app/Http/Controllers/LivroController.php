@@ -35,7 +35,7 @@ class LivroController extends Controller
     public function index()
     {
         $livros = Livro::all();
-        return response()->json($livros);
+        return $this->success($livros);
     }
 
     /**
@@ -64,7 +64,7 @@ class LivroController extends Controller
     public function show($id)
     {
         $livro = Livro::findOrFail($id);
-        return response()->json($livro);
+        return $this->success($livro);
     }
 
     /**
@@ -92,7 +92,7 @@ class LivroController extends Controller
             $livroValidator = new LivroValidator($request->all());
 
             if (!$livroValidator->validate()) {
-                return $this->alert($livroValidator->errors(), RESPONSE_NOT_ACCEPTABLE);
+                return $this->alert($livroValidator->errors());
             }
 
             $valid_data = $livroValidator->validated();
@@ -146,7 +146,7 @@ class LivroController extends Controller
             $livroValidator = new LivroValidator(array_merge($request->all(), ['id' => $id]));
 
             if (!$livroValidator->validate()) {
-                return $this->alert($livroValidator->errors(), RESPONSE_NOT_ACCEPTABLE);
+                return $this->alert($livroValidator->errors());
             }
 
             $valid_data = $livroValidator->validated();
@@ -192,8 +192,12 @@ class LivroController extends Controller
      */
     public function destroy($id)
     {
-        $livro = Livro::findOrFail($id);
-        $livro->delete();
-        return response()->json(null, 204);
+        try {
+            $livro = Livro::findOrFail($id);
+            $livro->delete();
+            return $this->no_content();
+        } catch (\Throwable $err) {
+            return $this->error($err->getMessage(), RESPONSE_BAD_REQUEST);
+        }
     }
 }

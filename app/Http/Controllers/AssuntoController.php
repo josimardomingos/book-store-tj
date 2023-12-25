@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Assunto;
-use App\Models\Autor;
+use App\Validators\AssuntoValidator;
 use Illuminate\Http\Request;
+
+use const App\Traits\RESPONSE_BAD_REQUEST;
+use const App\Traits\RESPONSE_CREATED;
+use const App\Traits\RESPONSE_NOT_ACCEPTABLE;
 
 class AssuntoController extends Controller
 {
@@ -30,14 +34,14 @@ class AssuntoController extends Controller
     public function index()
     {
         $assuntos = Assunto::all();
-        return response()->json($assuntos);
+        return $this->success($assuntos);
     }
 
     /**
      *  @OA\Get(
      *     tags={"Assuntos"},
      *     path="/assuntos/{id}",
-     *     summary="Mostrar detalhes de um autor específico",
+     *     summary="Mostrar detalhes de um assunto específico",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -58,15 +62,15 @@ class AssuntoController extends Controller
      */
     public function show($id)
     {
-        $autor = Assunto::findOrFail($id);
-        return response()->json($autor);
+        $assunto = Assunto::findOrFail($id);
+        return $this->success($assunto);
     }
 
     /**
      * @OA\Post(
      *     tags={"Assuntos"},
      *     path="/assuntos",
-     *     summary="Criar um novo autor",
+     *     summary="Criar um novo assunto",
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(ref="#/components/schemas/Assunto")
@@ -83,15 +87,28 @@ class AssuntoController extends Controller
      */
     public function store(Request $request)
     {
-        $autor = Assunto::create($request->all());
-        return response()->json($autor, 201);
+        try {
+            $assuntoValidator = new AssuntoValidator($request->all());
+
+            if (!$assuntoValidator->validate()) {
+                return $this->alert($assuntoValidator->errors());
+            }
+
+            $valid_data = $assuntoValidator->validated();
+
+            $assunto = Assunto::create($valid_data);
+
+            return $this->success($assunto, __('assunto.create'), RESPONSE_CREATED);
+        } catch (\Throwable $err) {
+            return $this->error($err->getMessage(), RESPONSE_BAD_REQUEST);
+        }
     }
 
     /**
      * @OA\Put(
      *     tags={"Assuntos"},
      *     path="/assuntos/{id}",
-     *     summary="Atualizar os dados de um autor",
+     *     summary="Atualizar os dados de um assunto",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -117,16 +134,28 @@ class AssuntoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $autor = Assunto::findOrFail($id);
-        $autor->update($request->all());
-        return response()->json($autor, 200);
+        try {
+            $assuntoValidator = new AssuntoValidator(array_merge($request->all(), ['id' => $id]));
+
+            if (!$assuntoValidator->validate()) {
+                return $this->alert($assuntoValidator->errors());
+            }
+
+            $valid_data = $assuntoValidator->validated();
+
+            $assunto = Assunto::findOrFail($id);
+            $assunto->update($valid_data);
+            return $this->success($assunto, __('assunto.update'));
+        } catch (\Throwable $err) {
+            return $this->error($err->getMessage(), RESPONSE_BAD_REQUEST);
+        }
     }
 
     /**
      * @OA\Delete(
      *     tags={"Assuntos"},
      *     path="/assuntos/{id}",
-     *     summary="Excluir um autor",
+     *     summary="Excluir um assunto",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -146,8 +175,12 @@ class AssuntoController extends Controller
      */
     public function destroy($id)
     {
-        $autor = Assunto::findOrFail($id);
-        $autor->delete();
-        return response()->json(null, 204);
+        try {
+            $assunto = Assunto::findOrFail($id);
+            $assunto->delete();
+            return $this->no_content();
+        } catch (\Throwable $err) {
+            return $this->error($err->getMessage(), RESPONSE_BAD_REQUEST);
+        }
     }
 }
