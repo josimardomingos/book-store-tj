@@ -9,7 +9,6 @@ use Illuminate\Support\Arr;
 
 use const App\Traits\RESPONSE_BAD_REQUEST;
 use const App\Traits\RESPONSE_CREATED;
-use const App\Traits\RESPONSE_NOT_ACCEPTABLE;
 
 class LivroController extends Controller
 {
@@ -34,7 +33,7 @@ class LivroController extends Controller
      */
     public function index()
     {
-        $livros = Livro::all();
+        $livros = Livro::with(['assuntos'])->orderBy('titulo')->get();
         return $this->success($livros);
     }
 

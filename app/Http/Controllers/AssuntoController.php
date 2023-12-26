@@ -33,7 +33,7 @@ class AssuntoController extends Controller
      */
     public function index()
     {
-        $assuntos = Assunto::all();
+        $assuntos = Assunto::orderBy('descricao')->get();
         return $this->success($assuntos);
     }
 

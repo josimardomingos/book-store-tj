@@ -41,7 +41,7 @@
                 "tags": [
                     "Assuntos"
                 ],
-                "summary": "Criar um novo autor",
+                "summary": "Criar um novo assunto",
                 "operationId": "2e7489bfd9849f0707489d0f09c8263a",
                 "requestBody": {
                     "required": true,
@@ -72,7 +72,7 @@
                 "tags": [
                     "Assuntos"
                 ],
-                "summary": "Mostrar detalhes de um autor específico",
+                "summary": "Mostrar detalhes de um assunto específico",
                 "operationId": "75184321a3ffcd363b75f3e8bd451468",
                 "parameters": [
                     {
@@ -101,7 +101,7 @@
                 "tags": [
                     "Assuntos"
                 ],
-                "summary": "Atualizar os dados de um autor",
+                "summary": "Atualizar os dados de um assunto",
                 "operationId": "3f9c17df8d02b0b4e11917bce2a048e0",
                 "parameters": [
                     {
@@ -140,7 +140,7 @@
                 "tags": [
                     "Assuntos"
                 ],
-                "summary": "Excluir um autor",
+                "summary": "Excluir um assunto",
                 "operationId": "513e9acbc689a6e5f0855eb11ea43909",
                 "parameters": [
                     {

@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Assunto;
-use App\Models\Autor;
 use App\Models\Livraria;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Illuminate\Http\Request;
@@ -12,9 +10,6 @@ class LivrariaController extends Controller
 {
     function relatorio(Request $request)
     {
-
-        dd(array_values(Autor::inrandomorder()->limit(2)->get()->pluck('codau')->toArray()));
-
         $livraria = Livraria::all();
 
         $data = [
