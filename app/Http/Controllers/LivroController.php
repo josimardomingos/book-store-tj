@@ -33,7 +33,7 @@ class LivroController extends Controller
      */
     public function index()
     {
-        $livros = Livro::with(['assuntos'])->orderBy('titulo')->get();
+        $livros = Livro::with(['assuntos', 'autores'])->orderBy('titulo')->get();
         return $this->success($livros);
     }
 
