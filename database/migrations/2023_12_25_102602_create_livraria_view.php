@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up()
     {
-        DB::unprepared("CREATE VIEW vLivraria AS
+        DB::unprepared("CREATE OR REPLACE VIEW vLivraria AS
             SELECT
                 autor.nome
                 , livro.titulo, livro.editora, livro.edicao, livro.anopublicacao, livro.valor
