@@ -4,12 +4,11 @@ namespace Tests\Feature;
 
 use App\Models\Assunto;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class AssuntoControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    // use RefreshDatabase;
 
     public function test_pode_listar_todos_os_assuntos()
     {
