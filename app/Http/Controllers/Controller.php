@@ -22,6 +22,10 @@ use Illuminate\Routing\Controller as BaseController;
  *          url="https://www.apache.org/licenses/LICENSE-2.0.html"
  *      )
  * ),
+ * @OA\Server(
+ *      url="/api",
+ *      description="Book store api"
+ * ),
  */
 class Controller extends BaseController
 {
