@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Autor;
-use App\Validators\AutorValidator;
+use App\Services\AutorService;
 use Illuminate\Http\Request;
 
 use const App\Traits\RESPONSE_BAD_REQUEST;
@@ -11,6 +10,13 @@ use const App\Traits\RESPONSE_CREATED;
 
 class AutorController extends Controller
 {
+    private $autorService;
+
+    public function __construct(AutorService $autorService)
+    {
+        $this->autorService = $autorService;
+    }
+
     /**
      *  @OA\Get(
      *     tags={"Autores"},
@@ -32,7 +38,7 @@ class AutorController extends Controller
      */
     public function index()
     {
-        $autores = Autor::orderBy('nome')->get();
+        $autores = $this->autorService->listar('nome');
         return $this->success($autores);
     }
 
@@ -61,7 +67,7 @@ class AutorController extends Controller
      */
     public function show($id)
     {
-        $autor = Autor::findOrFail($id);
+        $autor = $this->autorService->obter($id);
         return $this->success($autor);
     }
 
@@ -87,15 +93,8 @@ class AutorController extends Controller
     public function store(Request $request)
     {
         try {
-            $autorValidator = new AutorValidator($request->all());
+            $autor = $this->autorService->criar($request->all());
 
-            if (!$autorValidator->validate()) {
-                return $this->alert($autorValidator->errors());
-            }
-
-            $valid_data = $autorValidator->validated();
-
-            $autor = Autor::create($valid_data);
             return $this->success($autor, __('autor.create'), RESPONSE_CREATED);
         } catch (\Throwable $err) {
             return $this->error($err->getMessage(), RESPONSE_BAD_REQUEST);
@@ -133,16 +132,8 @@ class AutorController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $autorValidator = new AutorValidator($request->all());
+            $autor = $this->autorService->alterar($id, $request->all());
 
-            if (!$autorValidator->validate()) {
-                return $this->alert($autorValidator->errors());
-            }
-
-            $valid_data = $autorValidator->validated();
-
-            $autor = Autor::findOrFail($id);
-            $autor->update($valid_data);
             return $this->success($autor, __('autor.update'));
         } catch (\Throwable $err) {
             return $this->error($err->getMessage(), RESPONSE_BAD_REQUEST);
@@ -174,8 +165,7 @@ class AutorController extends Controller
     public function destroy($id)
     {
         try {
-            $autor = Autor::findOrFail($id);
-            $autor->delete();
+            $this->autorService->excluir($id);
             return $this->no_content();
         } catch (\Throwable $err) {
             return $this->error($err->getMessage(), RESPONSE_BAD_REQUEST);

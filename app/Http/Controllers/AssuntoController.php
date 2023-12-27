@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Assunto;
-use App\Validators\AssuntoValidator;
+use App\Services\AssuntoService;
 use Illuminate\Http\Request;
 
 use const App\Traits\RESPONSE_BAD_REQUEST;
@@ -11,6 +11,13 @@ use const App\Traits\RESPONSE_CREATED;
 
 class AssuntoController extends Controller
 {
+    private $assuntoService;
+
+    public function __construct(AssuntoService $assuntoService)
+    {
+        $this->assuntoService = $assuntoService;
+    }
+
     /**
      *  @OA\Get(
      *     tags={"Assuntos"},
@@ -32,7 +39,7 @@ class AssuntoController extends Controller
      */
     public function index()
     {
-        $assuntos = Assunto::orderBy('descricao')->get();
+        $assuntos = $this->assuntoService->listar('descricao');
         return $this->success($assuntos);
     }
 
@@ -61,7 +68,7 @@ class AssuntoController extends Controller
      */
     public function show($id)
     {
-        $assunto = Assunto::findOrFail($id);
+        $assunto = $this->assuntoService->obter($id);
         return $this->success($assunto);
     }
 
@@ -87,15 +94,7 @@ class AssuntoController extends Controller
     public function store(Request $request)
     {
         try {
-            $assuntoValidator = new AssuntoValidator($request->all());
-
-            if (!$assuntoValidator->validate()) {
-                return $this->alert($assuntoValidator->errors());
-            }
-
-            $valid_data = $assuntoValidator->validated();
-
-            $assunto = Assunto::create($valid_data);
+            $assunto = $this->assuntoService->criar($request->all());
 
             return $this->success($assunto, __('assunto.create'), RESPONSE_CREATED);
         } catch (\Throwable $err) {
@@ -134,16 +133,8 @@ class AssuntoController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $assuntoValidator = new AssuntoValidator(array_merge($request->all(), ['id' => $id]));
+            $assunto = $this->assuntoService->alterar($id, $request->all());
 
-            if (!$assuntoValidator->validate()) {
-                return $this->alert($assuntoValidator->errors());
-            }
-
-            $valid_data = $assuntoValidator->validated();
-
-            $assunto = Assunto::findOrFail($id);
-            $assunto->update($valid_data);
             return $this->success($assunto, __('assunto.update'));
         } catch (\Throwable $err) {
             return $this->error($err->getMessage(), RESPONSE_BAD_REQUEST);
@@ -175,8 +166,7 @@ class AssuntoController extends Controller
     public function destroy($id)
     {
         try {
-            $assunto = Assunto::findOrFail($id);
-            $assunto->delete();
+            $this->assuntoService->excluir($id);
             return $this->no_content();
         } catch (\Throwable $err) {
             return $this->error($err->getMessage(), RESPONSE_BAD_REQUEST);

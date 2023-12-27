@@ -38,7 +38,7 @@ class LivroController extends Controller
      */
     public function index()
     {
-        $livros = $this->livroService->listar();
+        $livros = $this->livroService->listar('titulo');
         return $this->success($livros);
     }
 
@@ -164,7 +164,11 @@ class LivroController extends Controller
      */
     public function destroy($id)
     {
-        $this->livroService->excluir($id);
-        return $this->no_content();
+        try {
+            $this->livroService->excluir($id);
+            return $this->no_content();
+        } catch (\Throwable $err) {
+            return $this->error($err->getMessage(), RESPONSE_BAD_REQUEST);
+        }
     }
 }
