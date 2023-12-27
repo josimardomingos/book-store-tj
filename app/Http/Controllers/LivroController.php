@@ -2,16 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Livro;
-use App\Validators\LivroValidator;
+use App\Services\LivroService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 
 use const App\Traits\RESPONSE_BAD_REQUEST;
 use const App\Traits\RESPONSE_CREATED;
 
 class LivroController extends Controller
 {
+    private $livroService;
+
+    public function __construct(LivroService $livroService)
+    {
+        $this->livroService = $livroService;
+    }
+
     /**
      *  @OA\Get(
      *     tags={"Livros"},
@@ -33,7 +38,7 @@ class LivroController extends Controller
      */
     public function index()
     {
-        $livros = Livro::with(['assuntos', 'autores'])->orderBy('titulo')->get();
+        $livros = $this->livroService->listar();
         return $this->success($livros);
     }
 
@@ -62,7 +67,7 @@ class LivroController extends Controller
      */
     public function show($id)
     {
-        $livro = Livro::findOrFail($id);
+        $livro = $this->livroService->obter($id);
         return $this->success($livro);
     }
 
@@ -88,22 +93,7 @@ class LivroController extends Controller
     public function store(Request $request)
     {
         try {
-            $livroValidator = new LivroValidator($request->all());
-
-            if (!$livroValidator->validate()) {
-                return $this->alert($livroValidator->errors());
-            }
-
-            $valid_data = $livroValidator->validated();
-            $livro = Livro::create($valid_data);
-
-            if (Arr::has($valid_data, 'autores')) {
-                $livro->autores()->sync($valid_data['autores']);
-            }
-
-            if (Arr::has($valid_data, 'assuntos')) {
-                $livro->assuntos()->sync($valid_data['assuntos']);
-            }
+            $livro = $this->livroService->criar($request->all());
 
             return $this->success($livro, __('livro.create'), RESPONSE_CREATED);
         } catch (\Throwable $err) {
@@ -142,24 +132,7 @@ class LivroController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $livroValidator = new LivroValidator(array_merge($request->all(), ['id' => $id]));
-
-            if (!$livroValidator->validate()) {
-                return $this->alert($livroValidator->errors());
-            }
-
-            $valid_data = $livroValidator->validated();
-
-            $livro = Livro::findOrFail($id);
-            $livro->update($valid_data);
-
-            if (Arr::has($valid_data, 'autores')) {
-                $livro->autores()->sync($valid_data['autores']);
-            }
-
-            if (Arr::has($valid_data, 'assuntos')) {
-                $livro->assuntos()->sync($valid_data['assuntos']);
-            }
+            $livro = $this->livroService->alterar($id, $request->all());
 
             return $this->success($livro, __('livro.update'));
         } catch (\Throwable $err) {
@@ -191,12 +164,7 @@ class LivroController extends Controller
      */
     public function destroy($id)
     {
-        try {
-            $livro = Livro::findOrFail($id);
-            $livro->delete();
-            return $this->no_content();
-        } catch (\Throwable $err) {
-            return $this->error($err->getMessage(), RESPONSE_BAD_REQUEST);
-        }
+        $this->livroService->excluir($id);
+        return $this->no_content();
     }
 }

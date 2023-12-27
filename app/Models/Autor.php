@@ -26,8 +26,6 @@ class Autor extends Model
         'nome',
     ];
 
-    // protected $with = ['livros'];
-
     public function livros(): BelongsToMany
     {
         return $this->belongsToMany(Livro::class, 'livro_autor', 'autor_codau', 'livro_codl');

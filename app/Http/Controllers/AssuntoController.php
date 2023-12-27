@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 use const App\Traits\RESPONSE_BAD_REQUEST;
 use const App\Traits\RESPONSE_CREATED;
-use const App\Traits\RESPONSE_NOT_ACCEPTABLE;
 
 class AssuntoController extends Controller
 {

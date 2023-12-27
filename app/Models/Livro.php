@@ -44,7 +44,7 @@ class Livro extends Model
         'valor',
     ];
 
-    // protected $with = ['autores', 'assuntos'];
+    protected $with = ['autores', 'assuntos'];
 
     public function autores(): BelongsToMany
     {
