@@ -65,3 +65,5 @@ docker-compose exec php sh /scripts/test.sh
 ```
 
 5. Para visualizar a documentação (swagger) : [http://localhost:8000/api/documentation](http://localhost:8000/api/documentation)
+
+6. Para facilitar possíveis testes, foi adicionado ao projeto todos os endpoints do postman no arquivo [Store-Book.postman_collection.json](./Store-Book.postman_collection.json)
