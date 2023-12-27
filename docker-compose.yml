@@ -1,0 +1,51 @@
+version: "3"
+
+services:
+    # Serviço PHP
+    php:
+        container_name: ${APP_NAME}_php
+        build: ./docker-assets/php-fpm
+        entrypoint: /scripts/setup.sh
+        volumes:
+            - ./docker-assets/php-fpm/scripts:/scripts
+            - .:/var/www/html
+        networks:
+            - my_network
+
+    # Serviço NGINX
+    nginx:
+        container_name: ${APP_NAME}_nginx
+        image: nginx:latest
+        ports:
+            - "${APP_PORT}:80"
+        volumes:
+            - ./:/var/www/html
+            - ./docker-assets/nginx/config/default.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+            - php
+        networks:
+            - my_network
+
+    # Serviço MySQL
+    mysql:
+        image: mysql:8.0.16
+        container_name: ${APP_NAME}_mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+        volumes:
+            - ./docker-assets/mysql/custom.cnf:/etc/mysql/conf.d/custom.cnf
+            - ./docker-assets/mysql/mysql_data:/var/lib/mysql
+        networks:
+            - my_network
+        ports:
+            - "${DB_PORT}:3306"
+
+volumes:
+    mysql_data:
+
+networks:
+    my_network:
+        driver: bridge

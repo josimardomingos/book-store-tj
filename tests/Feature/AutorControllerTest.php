@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class AutorControllerTest extends TestCase
 {
-    // use RefreshDatabase;
+    use RefreshDatabase;
 
     public function test_pode_listar_todos_os_autores()
     {
