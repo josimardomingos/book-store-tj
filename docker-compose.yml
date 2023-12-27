@@ -9,6 +9,8 @@ services:
         volumes:
             - ./docker-assets/php-fpm/scripts:/scripts
             - .:/var/www/html
+        depends_on:
+            - mysql
         networks:
             - my_network
 
@@ -41,7 +43,7 @@ services:
         networks:
             - my_network
         ports:
-            - "${DB_PORT}:3306"
+            - "${APP_DB_PORT}:3306"
 
 volumes:
     mysql_data:
